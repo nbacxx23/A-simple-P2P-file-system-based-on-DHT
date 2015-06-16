@@ -1,10 +1,16 @@
 package chord;
 
+import java.util.HashMap;
+import chord.Testnode;
+
 public class Fingerline {
    private double start;
    private double successor;
    private double end;
+   static final int m = 2;
    private double[][] interval= new double[m][2];
+   private HashMap[] hashsuccessor = new HashMap[m];
+   
    public void setStart(int id, int k)
 	{
 		this.start = (id + Math.pow(2, k))% (Math.pow(2, m));
@@ -13,9 +19,24 @@ public class Fingerline {
 	{
 		return this.start;
 	}
-	public void setSuccessor(int successor)
+	public void setSuccessor(Node node,int k)
 	{
-		this.successor = successor;
+	    int size = node.getSizeSuccessorsList();
+		int i=0;
+	    while(i<size)
+	    {
+	      if((node.getSuccessorsList(i).getId()>=node.fingerline[k].getStart())&&(node.getSuccessorsList(i).getId()<=node.fingerline[k].getEnd()))
+	      {
+	         this.successor = node.getSuccessorsList(i).getId();
+	         hashsuccessor[k] = new HashMap();
+	         hashsuccessor[k].put(node.fingerline[k].getStart(), this.successor);
+	         return;
+	      }
+	      i++;
+	    }
+	    this.successor = node.getSuccessorsList(0).getId();
+	    hashsuccessor[k] = new HashMap();
+        hashsuccessor[k].put(node.fingerline[k].getStart(), this.successor);
 	}
 	public double getSuccessor()
 	{
@@ -34,11 +55,11 @@ public class Fingerline {
 		this.interval[j][0]= start;
 		this.interval[j][1]= end;
 	}
-	public double getIntervel()
+	public double[] getIntervel(int j)
 	{
-		return this.successor;
+		return this.interval[j];
 	}
-   static final int m = 2;
+   
    public void setFingerline(){
 	
    }

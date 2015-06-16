@@ -11,8 +11,7 @@ public class Node {
 	
 	int sourcekey[]= new int[4];
 	
-	HashMap[] hashsuccessor = new HashMap[2];
-	int[] source = new int[4];
+	private List<Integer> source = null;
 	Fingerline[] fingerline = new Fingerline[Fingerline.m]; 
 	
 	public void setId(int id)
@@ -47,12 +46,16 @@ public class Node {
 	{
 		return (Node)this.successors.get(index);
 	}
-	public void lookup(int sourcekey)
+    public int getSizeSuccessorsList()
+    {
+	    return this.successors.size(); 
+    }
+	public void upload(int source)
 	{
-        
+		this.source.add(source);
 	}
-	public void upload(int source,int index)
+	public int getSource(int index)
 	{
-		this.source[index]=source;
+		return this.source.get(index);
 	}
 }
