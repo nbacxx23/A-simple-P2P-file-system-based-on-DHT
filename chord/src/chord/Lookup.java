@@ -9,7 +9,7 @@ public class Lookup {
     public static int findPredecessor(Node node,int id)
     {
     	int n1= node.getId();
-    	while(id<=n1 || id>=Testnode.node[n1].getSuccessorsList(0).getId() )
+    	while(id<=n1 || id>Testnode.node[n1].getSuccessorsList(0).getId() )
     		n1 = closestPrecedingFinger (Testnode.node[n1],id);
     	return n1;
     }
@@ -22,14 +22,14 @@ public class Lookup {
     	   else{
     		   if(node.getId()<id)
     			{
-    			   for(i=Fingerline.m-1;i!=0;i--)
+    			   for(i=Fingerline.m-1;i<0;i--)
     	    	    {
     	    	     if(node.getId()<=node.fingerline[i].getSuccessor() && id>=node.fingerline[i].getSuccessor())
     	    	    	 n = (int)node.fingerline[i].getSuccessor();
     	    	    }
     			  }
     		   else {
-    			   for(i=Fingerline.m-1;i!=0;i--)
+    			   for(i=Fingerline.m-1;i<0;i--)
     			   {
     				   if(node.fingerline[i].getSuccessor()>node.getId() || node.getId()<node.fingerline[i].getSuccessor())
     					   n = (int)node.fingerline[i].getSuccessor();

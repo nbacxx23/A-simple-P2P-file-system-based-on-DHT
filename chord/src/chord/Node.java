@@ -7,12 +7,13 @@ public class Node {
     private int id ;
     private String ip;	
 	private String port;
-	private List<Node> successors = null;
+	private List<Node> successors = new ArrayList<Node>();
 	
 	int sourcekey[]= new int[4];
 	
-	private List<Integer> source = null;
-	Fingerline[] fingerline = new Fingerline[Fingerline.m]; 
+	private List<Integer> source = new ArrayList<Integer>();
+	Fingerline[] fingerline = new Fingerline[Fingerline.m];
+	
 	
 	public void setId(int id)
 	{
@@ -44,7 +45,7 @@ public class Node {
 	}
 	public Node getSuccessorsList(int index)
 	{
-		return (Node)this.successors.get(index);
+		return this.successors.get(index);
 	}
     public int getSizeSuccessorsList()
     {

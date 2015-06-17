@@ -1,6 +1,4 @@
 package chord;
-import java.io.*;
-import java.util.HashMap;
 import chord.Node;
 
 public class Testnode {
@@ -39,6 +37,7 @@ public class Testnode {
 	   int j;
 	   for(j=0;j<Fingerline.m;j++)
 	   {
+	   node[i].fingerline[j]= new Fingerline();
 	   node[i].fingerline[j].setStart(node[i].getId(),j);
 	   node[i].fingerline[j].setEnd(node[i].getId(), j);
 	   node[i].fingerline[j].setInterval(node[i].fingerline[j].getStart(),node[i].fingerline[j].getEnd(),j);
@@ -47,7 +46,8 @@ public class Testnode {
 	   
 	 
    }
-     int location = Lookup.findSuccessor(node[1], 2);
+     int location; 
+     location = Lookup.findSuccessor(node[1], 2);
      System.out.println("the successor of the id 2: is node"+location);     
      
 }

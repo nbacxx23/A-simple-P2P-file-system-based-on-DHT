@@ -37,6 +37,7 @@ public class Fingerline {
 	    this.successor = node.getSuccessorsList(0).getId();
 	    hashsuccessor[k] = new HashMap();
         hashsuccessor[k].put(node.fingerline[k].getStart(), this.successor);
+        return;
 	}
 	public double getSuccessor()
 	{
@@ -60,7 +61,5 @@ public class Fingerline {
 		return this.interval[j];
 	}
    
-   public void setFingerline(){
-	
-   }
+   
 }
