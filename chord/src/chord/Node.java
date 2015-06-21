@@ -71,20 +71,11 @@ public class Node {
     	//if(Server.node[n1].fingerline[0].getSuccessor()<Server.node[n1].getId())
     	double compare = 0;
     	compare = Server.node[n1].getId() - Server.node[n1].fingerline[0].getSuccessor();
-    	if(compare < 0)
+    	while((compare < 0 && (id>Server.node[n1].fingerline[0].getSuccessor()|| id<=Server.node[n1].getId()))|| (compare>0 && id>Server.node[n1].fingerline[0].getSuccessor()&& id<=Server.node[n1].getId()))
     	{
-    	while(id>Server.node[n1].fingerline[0].getSuccessor()|| id<=Server.node[n1].getId())
-    	{
-    		n1 = closestPrecedingFinger(Server.node[n1],id);
-    	}   
-    	}
-    	else if(compare > 0)
-    	{
-    		while(id<Server.node[n1].fingerline[0].getSuccessor()&& id>=Server.node[n1].getId())
-        	{
-        		n1 = closestPrecedingFinger(Server.node[n1],id);
+    	    n1 = closestPrecedingFinger(Server.node[n1],id);
+    	    compare = Server.node[n1].getId() - Server.node[n1].fingerline[0].getSuccessor();
         	}   
-    	}
     	return n1;
     }
     public int closestPrecedingFinger(Node node,int id)
