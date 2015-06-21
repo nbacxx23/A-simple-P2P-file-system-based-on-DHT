@@ -23,29 +23,53 @@ public class Fingerline {
 	{
 	    int size = node.getSizeSuccessorsList();
 		int i=0;
-	    while(i<size)
+		double compare = node.fingerline[k].getStart() - node.fingerline[k].getEnd();
+	    if(compare < 0)
 	    {
-	      if((node.getSuccessorsList(i).getId()>=node.fingerline[k].getStart())&&(node.getSuccessorsList(i).getId()<=node.fingerline[k].getEnd()))
+	       while(i<size) 
+	    	{if((node.getSuccessorsList(i).getId()>=node.fingerline[k].getStart())&&(node.getSuccessorsList(i).getId()<=node.fingerline[k].getEnd()))
 	      {
 	         this.successor = node.getSuccessorsList(i).getId();
 	         hashsuccessor[k] = new HashMap();
 	         hashsuccessor[k].put(node.fingerline[k].getStart(), this.successor);
 	         return;
 	      }
-	      i++;
-	    }
+	    	else {
+	    		i++;
+	    		continue;}}
 	    this.successor = node.getSuccessorsList(0).getId();
 	    hashsuccessor[k] = new HashMap();
         hashsuccessor[k].put(node.fingerline[k].getStart(), this.successor);
         return;
+        
+	    }
+	    else 
+	    {
+	    	while(i<size) 
+	    	{if((node.getSuccessorsList(i).getId()>=node.fingerline[k].getStart())|| (node.getSuccessorsList(i).getId()<=node.fingerline[k].getEnd()))
+	      {
+	         this.successor = node.getSuccessorsList(i).getId();
+	         hashsuccessor[k] = new HashMap();
+	         hashsuccessor[k].put(node.fingerline[k].getStart(), this.successor);
+	         return;
+	      }
+	    	else {
+	    		i++;
+	    		continue;}}
+	    this.successor = node.getSuccessorsList(0).getId();
+	    hashsuccessor[k] = new HashMap();
+        hashsuccessor[k].put(node.fingerline[k].getStart(), this.successor);
+        return;
+	    }
 	}
+	    
 	public double getSuccessor()
 	{
 		return this.successor;
 	}
 	public void setEnd(int id,int k)
 	{
-		this.end = id + Math.pow(2, (k+1))% (Math.pow(2, m));
+		this.end = (id + Math.pow(2, (k+1)))% (Math.pow(2, m));
 	}
 	public double getEnd()
 	{
