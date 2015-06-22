@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 
-public class Node {
+public class Node implements Runnable{
     private int id ;
     private String ip;	
 	private String port;
@@ -13,6 +13,11 @@ public class Node {
 	
 	private List<Integer> source = new ArrayList<Integer>();
 	Fingerline[] fingerline = new Fingerline[Fingerline.m];
+	
+	public void node(int id)
+	{
+		this.setId(id);
+	}
 	
 	
 	public void setId(int id)
@@ -121,5 +126,11 @@ public class Node {
     			}
     	   System.out.println(n);
            return n;
+    }
+    
+    public void run()
+    {
+    	this.upload(id);
+    	
     }
 }
