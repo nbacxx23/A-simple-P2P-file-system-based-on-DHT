@@ -4,13 +4,14 @@ package chord;
 public class Testnode {
    
    public static void main(String args[]){     
-     int location; 
+     int i; 
      Server.server();
-     System.out.println(Server.node[1].fingerline[1].getSuccessor());
      System.out.println("Just for testing");
-     location = Server.node[0].findSuccessor(3);
-     System.out.println("the successor of the id 0: is node"+location);     
-     
+     Server.node[7].join(Server.node[3]);  
+     ActiveNode.addActiveNode(Server.node[7]);
+     Server.node[3].join(Server.node[7]);
+     for(i=0;i<Fingerline.m;i++)
+     System.out.println(Server.node[3].fingerline[i].getSuccessor().getId());
 }
    
 }

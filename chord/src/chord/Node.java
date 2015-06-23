@@ -1,4 +1,5 @@
 package chord;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -6,7 +7,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 
-public class Node implements Runnable{
+public class Node implements Runnable,Comparable<Object>{
     private Integer id ;
     private String ip;	
 	private String port;
@@ -14,10 +15,17 @@ public class Node implements Runnable{
 	private Node predecessor;
 	private List<Node> successors = new ArrayList<Node>();
 	private List<String> commands = new ArrayList<String>(); 
-	private SortedSet<Double> sourcekey = new TreeSet<Double>();
+	private SortedSet<String> sourcekey = new TreeSet<String>();
     private HashMap<String,String> hashpredecessor = new HashMap<String,String>();
 
-    
+    public int compareTo(Object obj)
+    {
+    	Node n = (Node)obj;
+    	
+    	int num = new Integer(this.id).compareTo(new Integer(n.id));
+    	
+    	return num==0?this.compareTo(n):num;
+    }
 	private List<Double> source = new ArrayList<Double>();
 	Fingerline[] fingerline = new Fingerline[Fingerline.m];
 	
@@ -25,6 +33,9 @@ public class Node implements Runnable{
 	{
 		this.setId(id);
 	}
+	
+	
+	
 	
 	public void setPredecessor(Node node)
 	{
@@ -36,9 +47,9 @@ public class Node implements Runnable{
 		return this.predecessor;
 	}
 	
-	public void setSourcekey(double source) throws Exception
+	public void setSourcekey(String sourcekey) throws Exception
 	{
-		this.sourcekey.add(source);
+		this.sourcekey.add(sourcekey);
 	}
 	
 	public void setCommand(String command)
@@ -87,10 +98,25 @@ public class Node implements Runnable{
     {
 	    return this.successors.size(); 
     }
-	public void upload(double source)
+	public void upload(double source) throws Exception
 	{
+		Node node;
 		this.source.add(source);
+		String sourcekey = null;
+		sourcekey = Hashfunction.hashfunction(Double.toString(source));
+		
+		int pseudosourcekey = Integer.parseInt(sourcekey)%8;
+		
+		
+		node = findSuccessor(pseudosourcekey);
+		node.saveSource(sourcekey);
 	}
+	
+	public void saveSource(String sourcekey) throws Exception
+	{
+		this.setSourcekey(sourcekey);
+	}
+	
 	public double getSource(int index)
 	{
 		return this.source.get(index);
@@ -171,9 +197,10 @@ public class Node implements Runnable{
     		int i;
     		for(i=0;i<Fingerline.m;i++)
     		{
-    			this.fingerline[i].setSuccessor(node);
+    			this.fingerline[i] = new Fingerline();
+    			this.fingerline[i].setSuccessor(this);
     		}
-    		this.setPredecessor(node);
+    		this.setPredecessor(this);
     	}
     	
     }

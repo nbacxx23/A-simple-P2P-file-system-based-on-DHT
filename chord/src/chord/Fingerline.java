@@ -7,7 +7,7 @@ public class Fingerline {
    private double start;
    private Node successor;
    private double end;
-   static final int m = 2;
+   static final int m = 3;
    private double[][] interval= new double[m][2];
    private HashMap[] hashsuccessor = new HashMap[m];
    
