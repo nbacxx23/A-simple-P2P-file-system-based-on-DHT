@@ -5,7 +5,7 @@ import chord.Testnode;
 
 public class Fingerline {
    private double start;
-   private double successor;
+   private Node successor;
    private double end;
    static final int m = 2;
    private double[][] interval= new double[m][2];
@@ -19,8 +19,12 @@ public class Fingerline {
 	{
 		return this.start;
 	}
-	public void setSuccessor(Node node,int k)
+	
+	public void setSuccessor(Node node)
 	{
+		this.successor = node;
+		
+		/*
 	    int size = node.getSizeSuccessorsList();
 		int i=0;
 		double compare = node.fingerline[k].getStart() - node.fingerline[k].getEnd();
@@ -61,9 +65,10 @@ public class Fingerline {
         hashsuccessor[k].put(node.fingerline[k].getStart(), this.successor);
         return;
 	    }
+	    */
 	}
 	    
-	public double getSuccessor()
+	public Node getSuccessor()
 	{
 		return this.successor;
 	}

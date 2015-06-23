@@ -1,6 +1,10 @@
 package chord;
 
+import java.util.SortedSet;
+
 public final class Server {
+	
+	
 	final static Node[] node = new Node[4];
 	
 	public static void server()
@@ -10,8 +14,8 @@ public final class Server {
 		   {
 			  node[i] = new Node();
 			  node[i].setId(i);
-			  node[i].upload(i);
-			  node[i].sourcekey[0]= Hashfunction.hashfunction(node[i].getSource(0));
+//			  node[i].upload(i);
+			  
 		   }
 		   for(i=0;i<4;i++)               //initial the successor List
 			 {   
@@ -33,6 +37,7 @@ public final class Server {
 				 }
 				 
 			 }
+		   
 		   for(i=0;i<4;i++) //initial fingertable for each node
 		   {   
 			   int j;
@@ -44,7 +49,7 @@ public final class Server {
 			   node[i].fingerline[j].setInterval(node[i].fingerline[j].getStart(),node[i].fingerline[j].getEnd(),j);
 			   node[i].fingerline[j].setSuccessor(node[i], j);
 			   }
-			   
+			   SortedSet<E>
 			 
 		   }
 	}

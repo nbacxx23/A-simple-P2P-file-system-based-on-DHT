@@ -11,7 +11,7 @@ public class Hashfunction{
      * @param 待加密字符串
      * @return 返回40位SHA码
      */
-    public static String shaEncode(String inStr) throws Exception {
+    public static String hashfunction(String inStr) throws Exception {
         MessageDigest sha = null;
         try {
             sha = MessageDigest.getInstance("SHA");
