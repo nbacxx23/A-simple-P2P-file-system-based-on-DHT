@@ -3,6 +3,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -185,11 +186,13 @@ public class Node implements Runnable,Comparable<Object>{
            return n;
     }
     
-    public void join(Node node)
+    public void join()
     {
-    	if(ActiveNode.isActiveNode(node.getId())==true)
+    	if(!ActiveNode.activenode.isEmpty())
     	{
-    		initFingerTable(node);
+    		Random random = new Random();
+    		int ref = random.nextInt((int)Math.pow(2, Fingerline.m));
+    		initFingerTable(Server.node[ref]);
     		updateOthers();
     	}
     	else 
@@ -198,6 +201,9 @@ public class Node implements Runnable,Comparable<Object>{
     		for(i=0;i<Fingerline.m;i++)
     		{
     			this.fingerline[i] = new Fingerline();
+    			this.fingerline[i].setStart(this.id, i);
+    	    	this.fingerline[i].setEnd(this.id, i);
+    	    	this.fingerline[i].setInterval(this.fingerline[i].getStart(), this.fingerline[i].getEnd(), i);
     			this.fingerline[i].setSuccessor(this);
     		}
     		this.setPredecessor(this);
@@ -214,14 +220,14 @@ public class Node implements Runnable,Comparable<Object>{
     public void initFingerTable(Node node)
     {
       int i;
-      for(i=0;i<0;i++)         // init start|end|interval
+      for(i=0;i<Fingerline.m;i++)         // init start|end|interval
       {   
     	  this.fingerline[i]= new Fingerline();
     	  this.fingerline[i].setStart(this.id, i);
     	  this.fingerline[i].setEnd(this.id, i);
     	  this.fingerline[i].setInterval(this.fingerline[i].getStart(), this.fingerline[i].getEnd(), i);
       }
-      this.setSuccessorsList(node.findSuccessor((int)node.fingerline[0].getStart()));
+      this.setSuccessorsList(node.findSuccessor((int)this.fingerline[0].getStart()));
       this.fingerline[0].setSuccessor(Server.node[this.getSuccessorsList(0).getId()]);
       this.setPredecessor(this.getSuccessorsList(0).getPredecessor());
       this.getSuccessorsList(0).setPredecessor(node);
@@ -229,7 +235,7 @@ public class Node implements Runnable,Comparable<Object>{
       {
     	  double compare = 0;
     	  compare = this.getId() - this.fingerline[i].getSuccessor().getId();
-    	  if((compare < 0 && (this.fingerline[i+1].getStart()>=this.getId() && this.fingerline[i+1].getStart()<this.fingerline[i].getSuccessor().getId()))|| (compare>0 && ( this.fingerline[i+1].getStart()>= this.getId() || this.fingerline[i+1].getStart()<this.fingerline[0].getSuccessor().getId())))
+    	  if((compare < 0 && (this.fingerline[i+1].getStart()>=this.getId() && this.fingerline[i+1].getStart()<this.fingerline[i].getSuccessor().getId()))|| (compare>0 && ( this.fingerline[i+1].getStart()>= this.getId() || this.fingerline[i+1].getStart()<this.fingerline[i].getSuccessor().getId())))
     	  {
     		  this.fingerline[i+1].setSuccessor(this.fingerline[i].getSuccessor());
     	  }      
@@ -242,22 +248,23 @@ public class Node implements Runnable,Comparable<Object>{
     public void updateOthers()
     {
     	int i;
-    	Node p;
+    	Node p = new Node();
     	for(i=0;i<Fingerline.m;i++)
     	{
-    		p = Server.node[this.findPredecessor((int)(this.getId()-Math.pow(2, i-1)))];
-    		p.updateFingerTable(p,this,i);
+    		p = Server.node[this.findPredecessor((int)(this.getId()-Math.pow(2, i)))];
+    		p.updateFingerTable(this,i);
     	}
     }
-    public void updateFingerTable(Node p,Node node,int i) // pas encore fini
+    public void updateFingerTable(Node node,int i) // pas encore fini
     {
       double compare = 0;
   	  compare = this.getId() - this.fingerline[i].getSuccessor().getId();
-  	  if((compare < 0 && (this.fingerline[i+1].getStart()>=this.getId() && this.fingerline[i+1].getStart()<this.fingerline[i].getSuccessor().getId()))|| (compare>0 && ( this.fingerline[i+1].getStart()>= this.getId() || this.fingerline[i+1].getStart()<this.fingerline[0].getSuccessor().getId())))
+  	  if((compare < 0 && (node.getId()>=this.getId() && node.getId()<this.fingerline[i].getSuccessor().getId()))|| (compare>0 && ((node.getId())>= this.getId() || node.getId()<this.fingerline[i].getSuccessor().getId())))
   	  {
+  		  Node p = new Node();
   		  this.fingerline[i].setSuccessor(node);
   		  p.setPredecessor(this.getPredecessor());
-  		  p.updateFingerTable(p, node, i);
+  		  p.updateFingerTable(node, i);
   	  }
     }
     

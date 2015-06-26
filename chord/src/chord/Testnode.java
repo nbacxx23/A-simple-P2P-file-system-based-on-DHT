@@ -7,9 +7,10 @@ public class Testnode {
      int i; 
      Server.server();
      System.out.println("Just for testing");
-     Server.node[7].join(Server.node[3]);  
+     Server.node[7].join();  
      ActiveNode.addActiveNode(Server.node[7]);
-     Server.node[3].join(Server.node[7]);
+     Server.node[3].join();
+     ActiveNode.addActiveNode(Server.node[3]);
      for(i=0;i<Fingerline.m;i++)
      System.out.println(Server.node[3].fingerline[i].getSuccessor().getId());
 }

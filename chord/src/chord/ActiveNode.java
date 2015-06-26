@@ -6,7 +6,7 @@ import java.util.TreeSet;
 
 public final class ActiveNode {
     
-	private static SortedSet<Node> activenode = new TreeSet<Node>();  
+	public static SortedSet<Node> activenode = new TreeSet<Node>();  
     
 	public static void addActiveNode(Node node)
 	{
@@ -18,7 +18,7 @@ public final class ActiveNode {
 		}
 	}
    
-	public  static boolean isActiveNode(int index)
+	public static boolean isActiveNode(int index)
 	{
 		return activenode.contains(index);
 	}
