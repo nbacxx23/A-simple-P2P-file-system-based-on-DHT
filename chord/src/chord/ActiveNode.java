@@ -1,12 +1,14 @@
 package chord;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 public final class ActiveNode {
     
-	public static SortedSet<Node> activenode = new TreeSet<Node>();  
+	public static List<Node> activenode = new ArrayList<Node>();  
     
 	public static void addActiveNode(Node node)
 	{
