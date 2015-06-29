@@ -200,28 +200,40 @@ public class Node implements Comparable<Object> {
 			this.fingerline[i].setEnd(this.id, i);
 			this.fingerline[i].setInterval(this.fingerline[i].getStart(),this.fingerline[i].getEnd(), i);
 		}
+		if(!ActiveNode.activenode.contains(Server.node[(int)this.fingerline[0].getStart()]))
 		this.setSuccessorsList(node.findSuccessor((int) this.fingerline[0].getStart()));
+		else this.setSuccessorsList(Server.node[(int)this.fingerline[0].getStart()]);
 		this.fingerline[0].setSuccessor(Server.node[this.getSuccessorsList(0).getId()]);
 		this.setPredecessor(this.getSuccessorsList(0).getPredecessor());
-		this.getSuccessorsList(0).setPredecessor(node);
-		for (i = 0; i < Fingerline.m - 1; i++) {
+		this.getSuccessorsList(0).setPredecessor(this);
+		for (i = 0; i < (Fingerline.m - 1); i++) {
 			double compare = 0;
 			compare = this.getId() - this.fingerline[i].getSuccessor().getId();
-			if ((compare < 0 && (this.fingerline[i + 1].getStart() >= this.getId() && this.fingerline[i + 1].getStart() < this.fingerline[i].getSuccessor().getId())) || (compare > 0 && (this.fingerline[i + 1].getStart() >= this.getId() || this.fingerline[i + 1].getStart() < this.fingerline[i].getSuccessor().getId()))) {
+			//System.out.println(this.fingerline[i].getSuccessor().getId());
+			if ((compare < 0 && (this.fingerline[i + 1].getStart() >= this.getId() && this.fingerline[i + 1].getStart() <= this.fingerline[i].getSuccessor().getId())) || (compare > 0 && (this.fingerline[i + 1].getStart() >= this.getId() || this.fingerline[i + 1].getStart() <= this.fingerline[i].getSuccessor().getId()))) {
 				this.fingerline[i + 1].setSuccessor(this.fingerline[i].getSuccessor());
+			   // System.out.println(this.fingerline[i+1].getSuccessor().getId());
 			} else {
-				this.fingerline[i + 1].setSuccessor(node.findSuccessor((int) this.fingerline[i].getStart()));
+				this.fingerline[i + 1].setSuccessor(node.findSuccessor((int) this.fingerline[i+1].getStart()));
+			   // System.out.println(this.fingerline[i+1].getSuccessor().getId());
 			}
 		}
+		
 	}
 
 	public void updateOthers() {
 		int i;
-		Node p = new Node();
 		for (i = 0; i < Fingerline.m; i++) {
-			p = Server.node[this.findPredecessor((int) (this.getId() - Math.pow(2, i)))];
+			Node p = new Node();
+			int k = (int) (this.getId()-Math.pow(2, i));
+			if(k<0) k = k +(int) Math.pow(2, Fingerline.m) ;
+		    if(!ActiveNode.activenode.contains(Server.node[k]))
+			p = Server.node[this.findPredecessor(k)];
+		    else p = Server.node[k];
+		    System.out.println("node for update:"+p.getId());
 			p.updateFingerTable(this, i);
 		}
+		
 
 	}
 
@@ -229,16 +241,16 @@ public class Node implements Comparable<Object> {
 	{
 		double compare = 0;
 		compare = this.getId() - this.fingerline[i].getSuccessor().getId();
-		if ((compare == 0) || (compare < 0 && (node.getId() >= this.getId() && node.getId() < this.fingerline[i].getSuccessor().getId()))	|| (compare > 0 && ((node.getId()) >= this.getId() || node.getId() < this.fingerline[i].getSuccessor().getId()))) 
+		if ((compare < 0 && (node.getId() > this.getId() && node.getId() < this.fingerline[i].getSuccessor().getId()))	|| (compare >= 0 && ((node.getId()) > this.getId() || node.getId() < this.fingerline[i].getSuccessor().getId()))) 
 		{
-			Node p = new Node();
 			this.fingerline[i].setSuccessor(node);
-			p.setPredecessor(this.getPredecessor());
-			p.updateFingerTable(node, i);
-		}
-		
+			//System.out.println(this.fingerline[i].getSuccessor().id);
+		Node p = new Node();
+		p = this.predecessor;
+		p.updateFingerTable(node, i);
 	}
-
+	}
+	
 	public void run() {
 
 	}
