@@ -163,7 +163,64 @@ public class Node implements Comparable<Object> {
 		// System.out.println(n);
 		return n;
 	}
-
+    
+	public void join()
+	{
+		if (!ActiveNode.activenode.isEmpty()) {
+			int size = ActiveNode.activenode.size();
+			Random random = new Random();
+			int ref = random.nextInt(size);
+			this.predecessor = null;
+			this.setSuccessorsList(ActiveNode.activenode.get(ref).findSuccessor(this.getId()));
+			this.fingerline[0].setSuccessor(this.getSuccessorsList(0));
+			
+		}
+		else {
+			int i;
+		    for (i = 0; i < Fingerline.m; i++) {
+			this.fingerline[i] = new Fingerline();
+			this.fingerline[i].setStart(this.id, i);
+			this.fingerline[i].setEnd(this.id, i);
+			this.fingerline[i].setInterval(this.fingerline[i].getStart(),this.fingerline[i].getEnd(), i);
+			this.fingerline[i].setSuccessor(this);
+			}
+	}
+	}
+	
+	public void stablize()
+	{
+		Node x = new Node();
+		x = this.fingerline[0].getSuccessor().getPredecessor();
+		double compare = 0;
+		compare = this.getId()-this.fingerline[0].getSuccessor().getId();
+		if ((compare < 0 && (x.getId() > this.getId() && x.getId() < this.fingerline[0].getSuccessor().getId()))	|| (compare > 0 && ((x.getId()) > this.getId() || x.getId() < this.fingerline[0].getSuccessor().getId()))) 
+		{
+           this.setSuccessorsList(x);
+           this.fingerline[0].setSuccessor(x);
+           this.fingerline[0].getSuccessor().notifyothers(this);
+		}
+	}
+	
+	public void notifyothers(Node node)
+	{
+		double compare = 0;
+		compare = this.getPredecessor().getId()-this.getId();
+		if((this.getPredecessor()==null) || (compare < 0 && (node.getId() > this.getPredecessor().getId()) && (node.getId() < this.getId())) || (compare > 0 && (node.getId() > this.getPredecessor().getId() || node.getId() < this.getId())))
+		{
+			this.setPredecessor(node);
+		}
+	}
+	
+	public void fixFingers()
+	{
+		int next =0;
+		if(next >= Fingerline.m)
+		{
+			next=0;
+		}
+		this.fingerline[next].setSuccessor(this.findSuccessor((int)this.fingerline[next].getStart()));
+	}
+	/*  first version without concurrence 
 	public void join() {
 		if (!ActiveNode.activenode.isEmpty()) {
 			int size = ActiveNode.activenode.size();
@@ -185,12 +242,16 @@ public class Node implements Comparable<Object> {
 		}
 
 	}
-
+    */
+	
+	
+    
 	public boolean leave(Node node) {
 
 		return true;
 	}
 
+	/*
 	public void initFingerTable(Node node) {
 		int i;
 		for (i = 0; i < Fingerline.m; i++) // init start|end|interval
@@ -250,7 +311,7 @@ public class Node implements Comparable<Object> {
 		p.updateFingerTable(node, i);
 	}
 	}
-	
+	*/
 	public void run() {
 
 	}
