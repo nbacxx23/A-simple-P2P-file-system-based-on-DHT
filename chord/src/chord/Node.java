@@ -3,17 +3,20 @@ package chord;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Queue;
 import java.util.Random;
 import java.util.SortedSet;
+import java.util.TimerTask;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class Node implements Comparable<Object> {
+public class Node implements Runnable,Comparable<Object> {
 	private int id;
 	private String ip;
 	private String port;
 	public boolean active;
 	private Node predecessor;
-	private List<Node> successors = new ArrayList<Node>();
+	private Queue<Node> successors = new ConcurrentLinkedQueue<Node>();
 	private List<String> commands = new ArrayList<String>();
 	private SortedSet<String> sourcekey = new TreeSet<String>();
 	private HashMap<String, String> hashpredecessor = new HashMap<String, String>();
@@ -82,10 +85,7 @@ public class Node implements Comparable<Object> {
 		this.successors.add(node);
 	}
 
-	public Node getSuccessorsList(int index) {
-		return this.successors.get(index);
-	}
-
+	
 	public int getSizeSuccessorsList() {
 		return this.successors.size();
 	}
@@ -164,16 +164,23 @@ public class Node implements Comparable<Object> {
 		return n;
 	}
     
-	public void join()
+	public void joinNode()
 	{
 		if (!ActiveNode.activenode.isEmpty()) {
+			int i;
+			for (i = 0; i < Fingerline.m; i++) {
+				this.fingerline[i] = new Fingerline();
+				this.fingerline[i].setStart(this.id, i);
+				this.fingerline[i].setEnd(this.id, i);
+				this.fingerline[i].setInterval(this.fingerline[i].getStart(),this.fingerline[i].getEnd(), i);
+			}
 			int size = ActiveNode.activenode.size();
 			Random random = new Random();
 			int ref = random.nextInt(size);
-			this.predecessor = null;
-			this.setSuccessorsList(ActiveNode.activenode.get(ref).findSuccessor(this.getId()));
-			this.fingerline[0].setSuccessor(this.getSuccessorsList(0));
-			
+			this.setPredecessor(null);
+		    this.fingerline[0].setSuccessor(ActiveNode.activenode.get(ref).findSuccessor(this.getId()));
+			ActiveNode.addActiveNode(this);
+			this.active = true;
 		}
 		else {
 			int i;
@@ -184,6 +191,9 @@ public class Node implements Comparable<Object> {
 			this.fingerline[i].setInterval(this.fingerline[i].getStart(),this.fingerline[i].getEnd(), i);
 			this.fingerline[i].setSuccessor(this);
 			}
+		    this.setPredecessor(this); 
+		    ActiveNode.addActiveNode(this);
+		    this.active = true;
 	}
 	}
 	
@@ -191,21 +201,25 @@ public class Node implements Comparable<Object> {
 	{
 		Node x = new Node();
 		x = this.fingerline[0].getSuccessor().getPredecessor();
+		if(x.active==true)
+		{
 		double compare = 0;
 		compare = this.getId()-this.fingerline[0].getSuccessor().getId();
-		if ((compare < 0 && (x.getId() > this.getId() && x.getId() < this.fingerline[0].getSuccessor().getId()))	|| (compare > 0 && ((x.getId()) > this.getId() || x.getId() < this.fingerline[0].getSuccessor().getId()))) 
+		if ((compare < 0 && (x.getId() > this.getId() && x.getId() < this.fingerline[0].getSuccessor().getId()))	|| (compare >= 0 && ((x.getId()) > this.getId() || x.getId() < this.fingerline[0].getSuccessor().getId()))) 
 		{
-           this.setSuccessorsList(x);
-           this.fingerline[0].setSuccessor(x);
-           this.fingerline[0].getSuccessor().notifyothers(this);
+           this.fingerline[0].setSuccessor(x);  
 		}
+		}
+		this.fingerline[0].getSuccessor().notifyothers(this);
 	}
 	
 	public void notifyothers(Node node)
 	{
+		if(this.getPredecessor()==null)
+		this.setPredecessor(node);	
 		double compare = 0;
 		compare = this.getPredecessor().getId()-this.getId();
-		if((this.getPredecessor()==null) || (compare < 0 && (node.getId() > this.getPredecessor().getId()) && (node.getId() < this.getId())) || (compare > 0 && (node.getId() > this.getPredecessor().getId() || node.getId() < this.getId())))
+		if(this.getPredecessor().active==false || (compare < 0 && (node.getId() > this.getPredecessor().getId()) && (node.getId() < this.getId())) || (compare >= 0 && (node.getId() > this.getPredecessor().getId() || node.getId() < this.getId())))
 		{
 			this.setPredecessor(node);
 		}
@@ -213,12 +227,38 @@ public class Node implements Comparable<Object> {
 	
 	public void fixFingers()
 	{
-		int next =0;
-		if(next >= Fingerline.m)
+		for(int next=1;next<Fingerline.m;next++)
 		{
-			next=0;
+		if(ActiveNode.activenode.contains(Server.node[(int)this.fingerline[next].getStart()]))
+		{
+			this.fingerline[next].setSuccessor(Server.node[(int)this.fingerline[next].getStart()]);
 		}
 		this.fingerline[next].setSuccessor(this.findSuccessor((int)this.fingerline[next].getStart()));
+	}
+	}
+	
+	public void maintainSuccessorList()
+	{
+		this.successors.clear();
+		Node s = new Node();
+		s = this;
+		int i;
+	   	for(i=0;i<Fingerline.m;i++)
+	   	{
+	   		s = s.fingerline[0].getSuccessor();
+	   		System.out.println(s.getId());
+	   		this.successors.add(s);
+	   	}
+	}
+	
+	public void checkfailure()
+	{
+		if(this.fingerline[0].getSuccessor().active==false)
+		{
+		this.successors.remove();
+		System.out.println(this.successors.peek().getId());
+		this.fingerline[0].setSuccessor(this.successors.peek());
+		}
 	}
 	/*  first version without concurrence 
 	public void join() {
@@ -246,9 +286,10 @@ public class Node implements Comparable<Object> {
 	
 	
     
-	public boolean leave(Node node) {
-
-		return true;
+	public void leave() {
+		
+		 this.active = false;
+		 ActiveNode.activenode.remove(this);
 	}
 
 	/*
@@ -313,6 +354,62 @@ public class Node implements Comparable<Object> {
 	}
 	*/
 	public void run() {
-
+         this.joinNode();
+         try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+         int i=0;
+         while(i<20) 
+         {
+        	 
+        	 this.stablize();
+        	 System.out.println("stablize"+this.getId()+i);
+        	 if(i>13){
+        	 for(int j=0;j<8;j=j+2)
+        	 {
+             if(Server.node[j].fingerline[0].getSuccessor()==null)
+            	 System.out.print("successor:"+"null");
+             else
+            	 System.out.print("successor:"+Server.node[j].fingerline[0].getSuccessor().getId()+" ");
+             if(Server.node[j].getPredecessor()==null)
+            	 System.out.println("predecessor:"+"null ");
+             else
+            	 System.out.println("predecessor:"+Server.node[j].getPredecessor().id+" ");
+        	 }
+        	 }
+        	 
+        	 try {
+     			Thread.sleep(1000);
+     		} catch (InterruptedException e) {
+     			// TODO Auto-generated catch block
+     			e.printStackTrace();
+     		}
+        	 this.fixFingers();
+        	 try {
+      			Thread.sleep(1000);
+      		} catch (InterruptedException e) {
+      			// TODO Auto-generated catch block
+      			e.printStackTrace();
+      		}
+        	 this.maintainSuccessorList();
+        	 try {
+       			Thread.sleep(1000);
+       		} catch (InterruptedException e) {
+       			// TODO Auto-generated catch block
+       			e.printStackTrace();
+       		}
+        	 this.checkfailure();
+        	 try {
+        			Thread.sleep(1000);
+        		} catch (InterruptedException e) {
+        			// TODO Auto-generated catch block
+        			e.printStackTrace();
+        		}
+        	 i++;
+         }		
+         this.leave();
 	}
 }

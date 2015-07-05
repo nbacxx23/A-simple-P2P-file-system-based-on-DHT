@@ -2,7 +2,6 @@ package chord;
 
 public final class Server {
 	
-	
 	final static Node[] node = new Node[8];
 	
 	public static void server()
